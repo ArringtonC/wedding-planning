@@ -5,8 +5,8 @@
 // 3. Get your Project URL and anon key from Settings > API
 // 4. Replace the values below with your actual credentials
 
-const SUPABASE_URL = 'https://neolvrcutfpjkhalzmel.supabase.co'; // Replace with your Supabase URL
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lb2x2cmN1dGZwamtoYWx6bWVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NzgzNDEsImV4cCI6MjA2OTQ1NDM0MX0.duvYY0rIoegMRgszlPEMb9HY66_WrCpngMFSDcRNZuY'; // Replace with your Supabase anon key
+const SUPABASE_URL = 'https://iuhdaxnceemzbxwxmpdl.supabase.co'; // Replace with your Supabase URL
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1aGRheG5jZWVtemJ4d3htcGRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4Nzg5NzEsImV4cCI6MjA2OTQ1NDk3MX0.qk5Gxo6IVIQqVQwHuxI7J-QKzMtHFd9Z5uPdRH5uDXA'; // Replace with your Supabase anon key
 
 // Initialize Supabase client
 let supabase = null;
