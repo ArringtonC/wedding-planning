@@ -33,6 +33,15 @@ const App = () => {
     direction: 'asc' // 'asc' or 'desc'
   });
 
+  // Wedding Todo List state
+  const [weddingTodos, setWeddingTodos] = useState(() => loadData('weddingTodos', []));
+  const [newTodo, setNewTodo] = useState({
+    task: '',
+    dueDate: '',
+    completed: false
+  });
+  const [showAddTodo, setShowAddTodo] = useState(false);
+
   const [newVendor, setNewVendor] = useState({
     name: '',
     total: 0,
@@ -246,6 +255,10 @@ const App = () => {
   useEffect(() => {
     localStorage.setItem('ourFinances', JSON.stringify(ourFinances));
   }, [ourFinances]);
+
+  useEffect(() => {
+    localStorage.setItem('weddingTodos', JSON.stringify(weddingTodos));
+  }, [weddingTodos]);
 
   useEffect(() => {
     localStorage.setItem('completedVendors', JSON.stringify(completedVendors));
@@ -558,6 +571,30 @@ const App = () => {
     setTableSorting({ column, direction: newDirection });
   };
 
+  // Wedding Todo functions
+  const addWeddingTodo = () => {
+    if (newTodo.task.trim()) {
+      const todo = {
+        ...newTodo,
+        id: Date.now(),
+        createdAt: new Date().toISOString()
+      };
+      setWeddingTodos([...weddingTodos, todo]);
+      setNewTodo({ task: '', dueDate: '', completed: false });
+      setShowAddTodo(false);
+    }
+  };
+
+  const toggleTodoComplete = (id) => {
+    setWeddingTodos(weddingTodos.map(todo => 
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ));
+  };
+
+  const deleteTodo = (id) => {
+    setWeddingTodos(weddingTodos.filter(todo => todo.id !== id));
+  };
+
   const getSortedVendors = (vendorsToSort) => {
     if (!tableSorting.column) return vendorsToSort;
 
@@ -746,6 +783,16 @@ const App = () => {
               }`}
             >
               Vendors & Expenses
+            </button>
+            <button
+              onClick={() => setActiveTab('todos')}
+              className={`pb-2 px-4 font-semibold transition-colors ${
+                activeTab === 'todos' 
+                  ? 'text-purple-600 border-b-2 border-purple-600' 
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Wedding Todo ✨
             </button>
             <button
               onClick={() => setActiveTab('summary')}
@@ -2005,6 +2052,239 @@ const App = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'todos' && (
+            <div className="space-y-6">
+              {/* Cute Header */}
+              <div className="bg-gradient-to-r from-pink-50 via-purple-50 to-pink-50 p-8 rounded-2xl text-center">
+                <h2 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">
+                  ✨ Wedding Planning To-Do ✨
+                </h2>
+                <p className="text-gray-600 font-medium">Keep track of all your wedding tasks, one magical moment at a time 💕</p>
+              </div>
+
+              {/* Add New Todo */}
+              <div className="bg-white rounded-2xl shadow-lg border border-pink-100 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full flex items-center justify-center">
+                    <Plus className="w-4 h-4 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800">Add New Task</h3>
+                </div>
+                
+                {!showAddTodo ? (
+                  <button
+                    onClick={() => setShowAddTodo(true)}
+                    className="w-full py-4 border-2 border-dashed border-pink-200 rounded-xl text-pink-500 hover:border-pink-300 hover:bg-pink-50 transition-all duration-200 font-medium"
+                  >
+                    ✨ Add a new wedding task ✨
+                  </button>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">What needs to be done? 💭</label>
+                      <input
+                        type="text"
+                        value={newTodo.task}
+                        onChange={(e) => setNewTodo({...newTodo, task: e.target.value})}
+                        placeholder="e.g., Book wedding cake tasting..."
+                        className="w-full p-3 border border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent"
+                        autoFocus
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">When is it due? 📅</label>
+                      <input
+                        type="date"
+                        value={newTodo.dueDate}
+                        onChange={(e) => setNewTodo({...newTodo, dueDate: e.target.value})}
+                        className="w-full p-3 border border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent"
+                      />
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={addWeddingTodo}
+                        className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 rounded-xl hover:from-pink-600 hover:to-purple-600 transition-all duration-200 font-medium"
+                      >
+                        ✨ Add Task
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowAddTodo(false);
+                          setNewTodo({ task: '', dueDate: '', completed: false });
+                        }}
+                        className="px-6 bg-gray-100 text-gray-600 py-3 rounded-xl hover:bg-gray-200 transition-all duration-200"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Todo List */}
+              <div className="space-y-4">
+                {weddingTodos.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">💝</div>
+                    <h3 className="text-xl font-semibold text-gray-600 mb-2">No tasks yet!</h3>
+                    <p className="text-gray-500">Add your first wedding planning task above to get started</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Incomplete Tasks */}
+                    {weddingTodos.filter(todo => !todo.completed).length > 0 && (
+                      <div className="bg-white rounded-2xl shadow-lg border border-pink-100 p-6">
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="w-8 h-8 bg-gradient-to-r from-orange-400 to-pink-400 rounded-full flex items-center justify-center">
+                            <Calendar className="w-4 h-4 text-white" />
+                          </div>
+                          <h3 className="text-xl font-semibold text-gray-800">
+                            To Do ({weddingTodos.filter(todo => !todo.completed).length})
+                          </h3>
+                        </div>
+                        <div className="space-y-3">
+                          {weddingTodos
+                            .filter(todo => !todo.completed)
+                            .sort((a, b) => {
+                              if (!a.dueDate && !b.dueDate) return 0;
+                              if (!a.dueDate) return 1;
+                              if (!b.dueDate) return -1;
+                              return new Date(a.dueDate) - new Date(b.dueDate);
+                            })
+                            .map(todo => (
+                              <div key={todo.id} className="group bg-pink-25 hover:bg-pink-50 p-4 rounded-xl border border-pink-100 transition-all duration-200">
+                                <div className="flex items-start gap-4">
+                                  <button
+                                    onClick={() => toggleTodoComplete(todo.id)}
+                                    className="mt-1 w-6 h-6 border-2 border-pink-300 rounded-full hover:border-pink-400 transition-colors flex items-center justify-center"
+                                  >
+                                    <Circle className="w-4 h-4 text-pink-300" />
+                                  </button>
+                                  <div className="flex-1">
+                                    <p className="font-medium text-gray-800 mb-1">{todo.task}</p>
+                                    {todo.dueDate && (
+                                      <div className="flex items-center gap-2">
+                                        <Calendar className="w-4 h-4 text-pink-400" />
+                                        <span className="text-sm text-pink-600 font-medium">
+                                          {new Date(todo.dueDate).toLocaleDateString('en-US', { 
+                                            month: 'short', 
+                                            day: 'numeric',
+                                            year: 'numeric'
+                                          })}
+                                        </span>
+                                        {new Date(todo.dueDate) < new Date() && (
+                                          <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
+                                            Overdue
+                                          </span>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <button
+                                    onClick={() => deleteTodo(todo.id)}
+                                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all duration-200"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Completed Tasks */}
+                    {weddingTodos.filter(todo => todo.completed).length > 0 && (
+                      <div className="bg-white rounded-2xl shadow-lg border border-green-100 p-6">
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full flex items-center justify-center">
+                            <CheckCircle2 className="w-4 h-4 text-white" />
+                          </div>
+                          <h3 className="text-xl font-semibold text-gray-800">
+                            Completed ✨ ({weddingTodos.filter(todo => todo.completed).length})
+                          </h3>
+                        </div>
+                        <div className="space-y-3">
+                          {weddingTodos
+                            .filter(todo => todo.completed)
+                            .sort((a, b) => new Date(b.dueDate || 0) - new Date(a.dueDate || 0))
+                            .map(todo => (
+                              <div key={todo.id} className="group bg-green-25 hover:bg-green-50 p-4 rounded-xl border border-green-100 transition-all duration-200">
+                                <div className="flex items-start gap-4">
+                                  <button
+                                    onClick={() => toggleTodoComplete(todo.id)}
+                                    className="mt-1 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full flex items-center justify-center hover:from-green-500 hover:to-emerald-500 transition-all"
+                                  >
+                                    <CheckCircle2 className="w-4 h-4 text-white" />
+                                  </button>
+                                  <div className="flex-1">
+                                    <p className="font-medium text-gray-600 line-through mb-1">{todo.task}</p>
+                                    {todo.dueDate && (
+                                      <div className="flex items-center gap-2">
+                                        <Calendar className="w-4 h-4 text-green-400" />
+                                        <span className="text-sm text-green-600 font-medium">
+                                          {new Date(todo.dueDate).toLocaleDateString('en-US', { 
+                                            month: 'short', 
+                                            day: 'numeric',
+                                            year: 'numeric'
+                                          })}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <button
+                                    onClick={() => deleteTodo(todo.id)}
+                                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all duration-200"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* Progress Summary */}
+              {weddingTodos.length > 0 && (
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100">
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">Wedding Planning Progress</h3>
+                    <div className="flex items-center justify-center gap-6">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-purple-600">
+                          {weddingTodos.filter(todo => todo.completed).length}
+                        </div>
+                        <div className="text-sm text-gray-600">Completed</div>
+                      </div>
+                      <div className="text-4xl">💕</div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-pink-600">
+                          {weddingTodos.filter(todo => !todo.completed).length}
+                        </div>
+                        <div className="text-sm text-gray-600">To Do</div>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div 
+                          className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500"
+                          style={{ width: `${weddingTodos.length > 0 ? (weddingTodos.filter(todo => todo.completed).length / weddingTodos.length) * 100 : 0}%` }}
+                        />
+                      </div>
+                      <p className="text-sm text-gray-600 mt-2">
+                        {weddingTodos.length > 0 ? Math.round((weddingTodos.filter(todo => todo.completed).length / weddingTodos.length) * 100) : 0}% Complete
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
