@@ -273,12 +273,16 @@ const App = () => {
 
   // Initialize Supabase on component mount
   useEffect(() => {
-    initializeSupabase();
+    const init = async () => {
+      setSyncStatus('syncing');
+      await initializeSupabase();
+    };
+    init();
   }, []);
 
   // Auto-sync to Supabase when data changes (debounced)
   useEffect(() => {
-    if (!isSupabaseEnabled) return;
+    if (!isSupabaseEnabled || syncStatus === 'syncing') return;
     
     const syncTimeout = setTimeout(() => {
       saveToSupabase();
@@ -643,11 +647,13 @@ const App = () => {
         supabaseOps.getFunds()
       ]);
 
-      // Update state with Supabase data if available, otherwise keep localStorage data
-      if (supabaseVendors && supabaseVendors.length > 0) {
+      // Always update state with Supabase data if available (even empty arrays)
+      if (supabaseVendors !== null) {
+        console.log('Loading vendors from Supabase:', supabaseVendors.length, 'items');
         setVendors(supabaseVendors);
       }
-      if (supabaseTodos && supabaseTodos.length > 0) {
+      if (supabaseTodos !== null) {
+        console.log('Loading todos from Supabase:', supabaseTodos.length, 'items');
         setWeddingTodos(supabaseTodos);
       }
       if (supabaseFinances) {
@@ -660,7 +666,7 @@ const App = () => {
           jointPaid: supabaseFinances.joint_paid || 0
         });
       }
-      if (supabaseFunds && supabaseFunds.length > 0) {
+      if (supabaseFunds !== null) {
         setIncomingFunds(supabaseFunds);
       }
 
