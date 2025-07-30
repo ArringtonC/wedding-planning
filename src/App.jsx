@@ -470,17 +470,28 @@ const App = () => {
 
   // Supabase sync functions
   const initializeSupabase = async () => {
-    if (isSupabaseConfigured()) {
+    console.log('Checking Supabase configuration...');
+    const isConfigured = isSupabaseConfigured();
+    console.log('Supabase configured?', isConfigured);
+    
+    if (isConfigured) {
+      console.log('Initializing Supabase client...');
       const initialized = initSupabase();
+      console.log('Supabase client initialized?', initialized);
       setIsSupabaseEnabled(initialized);
       if (initialized) {
-        await loadFromSupabase();
+        console.log('✅ Supabase enabled, loading data...');
+        await loadFromSupabase(true); // Pass true to bypass the isSupabaseEnabled check
+      } else {
+        console.log('❌ Supabase failed to initialize');
       }
+    } else {
+      console.log('❌ Supabase not configured');
     }
   };
 
-  const loadFromSupabase = async () => {
-    if (!isSupabaseEnabled) {
+  const loadFromSupabase = async (forceEnabled = false) => {
+    if (!forceEnabled && !isSupabaseEnabled) {
       console.log('Supabase not enabled, falling back to localStorage');
       loadFromLocalStorage();
       return;
