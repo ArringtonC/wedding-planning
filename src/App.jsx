@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, Circle, Calendar, DollarSign, Users, AlertCircle, ChevronDown, ChevronUp, CreditCard, ExternalLink, Edit2, Plus, Trash2, Save, X, PiggyBank, TrendingUp, Wallet, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { CheckCircle2, Circle, Calendar, DollarSign, Users, AlertCircle, ChevronDown, ChevronUp, CreditCard, ExternalLink, Edit2, Plus, Trash2, Save, X, PiggyBank, TrendingUp, Wallet, ArrowUpDown, ArrowUp, ArrowDown, Download, Upload, Cloud, CloudOff } from 'lucide-react';
+import { initSupabase, isSupabaseConfigured, supabaseOps } from './supabase.js';
 
 const App = () => {
   // Load saved data from localStorage
@@ -41,6 +42,12 @@ const App = () => {
     completed: false
   });
   const [showAddTodo, setShowAddTodo] = useState(false);
+
+  // Supabase sync state
+  const [isSupabaseEnabled, setIsSupabaseEnabled] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState(null);
+  const [syncStatus, setSyncStatus] = useState('offline'); // 'offline', 'synced', 'syncing', 'error'
 
   const [newVendor, setNewVendor] = useState({
     name: '',
@@ -263,6 +270,22 @@ const App = () => {
   useEffect(() => {
     localStorage.setItem('completedVendors', JSON.stringify(completedVendors));
   }, [completedVendors]);
+
+  // Initialize Supabase on component mount
+  useEffect(() => {
+    initializeSupabase();
+  }, []);
+
+  // Auto-sync to Supabase when data changes (debounced)
+  useEffect(() => {
+    if (!isSupabaseEnabled) return;
+    
+    const syncTimeout = setTimeout(() => {
+      saveToSupabase();
+    }, 2000); // Wait 2 seconds after last change before syncing
+
+    return () => clearTimeout(syncTimeout);
+  }, [vendors, weddingTodos, ourFinances, incomingFunds, isSupabaseEnabled]);
 
   const calculateBudgetSummary = () => {
     const vendorTotals = vendors.reduce((acc, vendor) => ({
@@ -595,6 +618,123 @@ const App = () => {
     setWeddingTodos(weddingTodos.filter(todo => todo.id !== id));
   };
 
+  // Supabase sync functions
+  const initializeSupabase = async () => {
+    if (isSupabaseConfigured()) {
+      const initialized = initSupabase();
+      setIsSupabaseEnabled(initialized);
+      if (initialized) {
+        await loadFromSupabase();
+      }
+    }
+  };
+
+  const loadFromSupabase = async () => {
+    if (!isSupabaseEnabled) return;
+    
+    setIsSyncing(true);
+    setSyncStatus('syncing');
+    
+    try {
+      const [supabaseVendors, supabaseTodos, supabaseFinances, supabaseFunds] = await Promise.all([
+        supabaseOps.getVendors(),
+        supabaseOps.getTodos(),
+        supabaseOps.getFinances(),
+        supabaseOps.getFunds()
+      ]);
+
+      // Update state with Supabase data if available, otherwise keep localStorage data
+      if (supabaseVendors && supabaseVendors.length > 0) {
+        setVendors(supabaseVendors);
+      }
+      if (supabaseTodos && supabaseTodos.length > 0) {
+        setWeddingTodos(supabaseTodos);
+      }
+      if (supabaseFinances) {
+        setOurFinances({
+          michaelaSavings: supabaseFinances.michaela_savings || 0,
+          arringtonSavings: supabaseFinances.arrington_savings || 0,
+          jointSavings: supabaseFinances.joint_savings || 0,
+          michaelaPaid: supabaseFinances.michaela_paid || 0,
+          arringtonPaid: supabaseFinances.arrington_paid || 0,
+          jointPaid: supabaseFinances.joint_paid || 0
+        });
+      }
+      if (supabaseFunds && supabaseFunds.length > 0) {
+        setIncomingFunds(supabaseFunds);
+      }
+
+      setSyncStatus('synced');
+      setLastSyncTime(new Date());
+    } catch (error) {
+      console.error('Error loading from Supabase:', error);
+      setSyncStatus('error');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const saveToSupabase = async () => {
+    if (!isSupabaseEnabled || isSyncing) return;
+
+    setIsSyncing(true);
+    setSyncStatus('syncing');
+
+    try {
+      await Promise.all([
+        supabaseOps.saveVendors(vendors),
+        supabaseOps.saveTodos(weddingTodos),
+        supabaseOps.saveFinances({
+          michaela_savings: ourFinances.michaelaSavings,
+          arrington_savings: ourFinances.arringtonSavings,
+          joint_savings: ourFinances.jointSavings,
+          michaela_paid: ourFinances.michaelaPaid,
+          arrington_paid: ourFinances.arringtonPaid,
+          joint_paid: ourFinances.jointPaid
+        }),
+        supabaseOps.saveFunds(incomingFunds)
+      ]);
+
+      setSyncStatus('synced');
+      setLastSyncTime(new Date());
+    } catch (error) {
+      console.error('Error saving to Supabase:', error);
+      setSyncStatus('error');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const exportAllData = async () => {
+    let exportData;
+    
+    if (isSupabaseEnabled) {
+      // Export from Supabase
+      exportData = await supabaseOps.exportAllData();
+    } else {
+      // Export from localStorage
+      exportData = {
+        vendors,
+        todos: weddingTodos,
+        finances: ourFinances,
+        funds: incomingFunds,
+        exportedAt: new Date().toISOString()
+      };
+    }
+
+    if (exportData) {
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `wedding-planning-data-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
   const getSortedVendors = (vendorsToSort) => {
     if (!tableSorting.column) return vendorsToSort;
 
@@ -682,11 +822,52 @@ const App = () => {
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex justify-between items-center mb-2">
-            <div></div>
+            {/* Sync Status */}
+            <div className="flex items-center gap-2">
+              {syncStatus === 'offline' && (
+                <div className="flex items-center gap-2 text-gray-500">
+                  <CloudOff className="w-4 h-4" />
+                  <span className="text-sm">Offline Mode</span>
+                </div>
+              )}
+              {syncStatus === 'syncing' && (
+                <div className="flex items-center gap-2 text-blue-500">
+                  <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-sm">Syncing...</span>
+                </div>
+              )}
+              {syncStatus === 'synced' && (
+                <div className="flex items-center gap-2 text-green-500">
+                  <Cloud className="w-4 h-4" />
+                  <span className="text-sm">Cloud Synced</span>
+                  {lastSyncTime && (
+                    <span className="text-xs text-gray-400">
+                      {lastSyncTime.toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
+              )}
+              {syncStatus === 'error' && (
+                <div className="flex items-center gap-2 text-red-500">
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="text-sm">Sync Error</span>
+                </div>
+              )}
+            </div>
+            
             <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
               Wedding Financial Planner
             </h1>
+            
             <div className="flex space-x-2">
+              {/* Export Button */}
+              <button
+                onClick={exportAllData}
+                className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all text-sm"
+              >
+                <Download className="w-4 h-4" />
+                Export
+              </button>
               <button
                 onClick={fixVendorResponsibilities}
                 className="text-xs bg-blue-200 hover:bg-blue-300 px-2 py-1 rounded"
