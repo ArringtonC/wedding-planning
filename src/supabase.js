@@ -39,10 +39,29 @@ export const supabaseOps = {
       const { data, error } = await supabase
         .from('vendors')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('createdAt', { ascending: false });
       
       if (error) throw error;
-      return data || [];
+      console.log('Fetched vendors from Supabase:', data?.length || 0, 'items');
+      
+      // Map database fields to app fields if needed
+      const vendors = (data || []).map(vendor => ({
+        id: vendor.id,
+        name: vendor.name,
+        total: vendor.total || 0,
+        paid: vendor.paid || 0,
+        paidBy: vendor.paidBy || '',
+        remaining: vendor.remaining || 0,
+        remainingBy: vendor.remainingBy || 'Us',
+        responsibility: vendor.responsibility || 'Us',
+        dueDate: vendor.dueDate,
+        status: vendor.status || 'pending',
+        notes: vendor.notes || '',
+        link: vendor.link || '',
+        createdAt: vendor.createdAt
+      }));
+      
+      return vendors;
     } catch (error) {
       console.error('Error fetching vendors:', error);
       return null;
@@ -60,14 +79,30 @@ export const supabaseOps = {
 
       if (deleteError) throw deleteError;
 
-      const { error: insertError } = await supabase
-        .from('vendors')
-        .insert(vendors.map(vendor => ({
-          ...vendor,
-          created_at: vendor.createdAt || new Date().toISOString()
-        })));
+      // Only insert if there are vendors to save
+      if (vendors.length > 0) {
+        const { error: insertError } = await supabase
+          .from('vendors')
+          .insert(vendors.map(vendor => ({
+            id: vendor.id,
+            name: vendor.name,
+            total: vendor.total,
+            paid: vendor.paid,
+            paidBy: vendor.paidBy,
+            remaining: vendor.remaining,
+            remainingBy: vendor.remainingBy,
+            responsibility: vendor.responsibility,
+            dueDate: vendor.dueDate,
+            status: vendor.status,
+            notes: vendor.notes,
+            link: vendor.link,
+            createdAt: vendor.createdAt || new Date().toISOString()
+          })));
 
-      if (insertError) throw insertError;
+        if (insertError) throw insertError;
+      }
+      
+      console.log('Saved vendors to Supabase:', vendors.length, 'items');
       return true;
     } catch (error) {
       console.error('Error saving vendors:', error);
@@ -147,6 +182,7 @@ export const supabaseOps = {
         .single();
       
       if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows
+      console.log('Fetched finances from Supabase:', data);
       return data || null;
     } catch (error) {
       console.error('Error fetching finances:', error);
@@ -161,11 +197,17 @@ export const supabaseOps = {
         .from('finances')
         .upsert({
           id: 1,
-          ...finances,
+          michaela_savings: finances.michaela_savings,
+          arrington_savings: finances.arrington_savings,
+          joint_savings: finances.joint_savings,
+          michaela_paid: finances.michaela_paid,
+          arrington_paid: finances.arrington_paid,
+          joint_paid: finances.joint_paid,
           updated_at: new Date().toISOString()
         });
 
       if (error) throw error;
+      console.log('Saved finances to Supabase:', finances);
       return true;
     } catch (error) {
       console.error('Error saving finances:', error);
@@ -201,14 +243,25 @@ export const supabaseOps = {
 
       if (deleteError) throw deleteError;
 
-      const { error: insertError } = await supabase
-        .from('funds')
-        .insert(funds.map(fund => ({
-          ...fund,
-          created_at: fund.createdAt || new Date().toISOString()
-        })));
+      // Only insert if there are funds to save
+      if (funds.length > 0) {
+        const { error: insertError } = await supabase
+          .from('funds')
+          .insert(funds.map(fund => ({
+            id: fund.id,
+            source: fund.source,
+            amount: fund.amount,
+            dateExpected: fund.dateExpected,
+            dateReceived: fund.dateReceived,
+            status: fund.status,
+            notes: fund.notes,
+            createdAt: fund.createdAt || new Date().toISOString()
+          })));
 
-      if (insertError) throw insertError;
+        if (insertError) throw insertError;
+      }
+      
+      console.log('Saved funds to Supabase:', funds.length, 'items');
       return true;
     } catch (error) {
       console.error('Error saving funds:', error);
