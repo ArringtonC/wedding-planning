@@ -39,7 +39,7 @@ export const supabaseOps = {
       const { data, error } = await supabase
         .from('vendors')
         .select('*')
-        .order('createdAt', { ascending: false });
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       console.log('Fetched vendors from Supabase:', data?.length || 0, 'items');
@@ -58,7 +58,7 @@ export const supabaseOps = {
         status: vendor.status || 'pending',
         notes: vendor.notes || '',
         link: vendor.link || '',
-        createdAt: vendor.createdAt
+        createdAt: vendor.created_at
       }));
       
       return vendors;
@@ -96,7 +96,7 @@ export const supabaseOps = {
             status: vendor.status,
             notes: vendor.notes,
             link: vendor.link,
-            createdAt: vendor.createdAt || new Date().toISOString()
+            created_at: vendor.createdAt || new Date().toISOString()
           })));
 
         if (insertError) throw insertError;
@@ -117,7 +117,7 @@ export const supabaseOps = {
       const { data, error } = await supabase
         .from('wedding_todos')
         .select('*')
-        .order('createdAt', { ascending: false });
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       console.log('Fetched todos from Supabase:', data?.length || 0, 'items');
@@ -128,7 +128,7 @@ export const supabaseOps = {
         task: todo.task,
         dueDate: todo.dueDate,
         completed: todo.completed,
-        createdAt: todo.createdAt
+        createdAt: todo.created_at
       }));
       
       return todos;
@@ -158,7 +158,7 @@ export const supabaseOps = {
             task: todo.task,
             dueDate: todo.dueDate,
             completed: todo.completed,
-            createdAt: todo.createdAt || new Date().toISOString()
+            created_at: todo.createdAt || new Date().toISOString()
           })));
 
         if (insertError) throw insertError;
@@ -255,7 +255,7 @@ export const supabaseOps = {
             dateReceived: fund.dateReceived,
             status: fund.status,
             notes: fund.notes,
-            createdAt: fund.createdAt || new Date().toISOString()
+            created_at: fund.createdAt || new Date().toISOString()
           })));
 
         if (insertError) throw insertError;
