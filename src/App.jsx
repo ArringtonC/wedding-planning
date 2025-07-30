@@ -119,9 +119,16 @@ const App = () => {
   useEffect(() => {
     if (!isSupabaseEnabled || syncStatus === 'syncing') return;
     
+    console.log('Data changed, scheduling sync in 1 second...', {
+      vendors: vendors.length,
+      todos: weddingTodos.length,
+      funds: incomingFunds.length
+    });
+    
     const syncTimeout = setTimeout(() => {
+      console.log('Auto-sync triggered');
       saveToSupabase();
-    }, 2000); // Wait 2 seconds after last change before syncing
+    }, 1000); // Wait 1 second after last change before syncing
 
     return () => clearTimeout(syncTimeout);
   }, [vendors, weddingTodos, ourFinances, incomingFunds, isSupabaseEnabled]);
@@ -173,11 +180,14 @@ const App = () => {
       };
       setVendors(vendors.map(v => v.id === updatedVendor.id ? updatedVendor : v));
       setEditingVendor(null);
+      console.log('Vendor saved, triggering sync:', updatedVendor.name);
     }
   };
 
   const handleDeleteVendor = (id) => {
+    const vendorToDelete = vendors.find(v => v.id === id);
     setVendors(vendors.filter(v => v.id !== id));
+    console.log('Vendor deleted, triggering sync:', vendorToDelete?.name || id);
   };
 
   const handleAddVendor = () => {
@@ -203,6 +213,7 @@ const App = () => {
       link: ''
     });
     setShowAddVendor(false);
+    console.log('Vendor added, triggering sync:', vendor.name);
   };
 
   const handleAddFund = () => {
@@ -470,15 +481,17 @@ const App = () => {
 
   const loadFromSupabase = async () => {
     if (!isSupabaseEnabled) {
-      // Fallback to localStorage if Supabase is not enabled
+      console.log('Supabase not enabled, falling back to localStorage');
       loadFromLocalStorage();
       return;
     }
     
+    console.log('Starting Supabase data load...');
     setIsSyncing(true);
     setSyncStatus('syncing');
     
     try {
+      console.log('Fetching data from Supabase tables...');
       const [supabaseVendors, supabaseTodos, supabaseFinances, supabaseFunds] = await Promise.all([
         supabaseOps.getVendors(),
         supabaseOps.getTodos(),
@@ -486,16 +499,27 @@ const App = () => {
         supabaseOps.getFunds()
       ]);
 
+      console.log('Supabase fetch results:', {
+        vendors: supabaseVendors === null ? 'NULL' : `${supabaseVendors.length} items`,
+        todos: supabaseTodos === null ? 'NULL' : `${supabaseTodos.length} items`,
+        finances: supabaseFinances ? 'Found' : 'NULL',
+        funds: supabaseFunds === null ? 'NULL' : `${supabaseFunds.length} items`
+      });
+
       // Always update state with Supabase data if available (even empty arrays)
       if (supabaseVendors !== null) {
-        console.log('Loading vendors from Supabase:', supabaseVendors.length, 'items');
+        console.log('✅ Loading vendors from Supabase:', supabaseVendors.length, 'items');
         setVendors(supabaseVendors);
       } else {
+        console.log('❌ Supabase vendors returned null, checking localStorage...');
         // Fallback to localStorage for vendors
         const localVendors = loadData('weddingVendors', []);
+        console.log('LocalStorage vendors found:', localVendors.length, 'items');
         if (localVendors.length > 0) {
           console.log('Loading vendors from localStorage (Supabase fallback):', localVendors.length, 'items');
           setVendors(localVendors);
+        } else {
+          console.log('No vendors in localStorage either, starting with empty array');
         }
       }
       
@@ -1620,7 +1644,7 @@ const App = () => {
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center space-x-4">
                   <h2 className="text-xl font-bold">All Vendors & Expenses</h2>
-                  <span className="text-sm text-gray-600">({filteredVendors.length} vendors)</span>
+                  <span className="text-sm text-gray-600">({filteredVendors.length} vendors, {vendors.length} total)</span>
                   {completedVendors.length > 0 && (
                     <button
                       onClick={() => setShowCompletedVendors(!showCompletedVendors)}
