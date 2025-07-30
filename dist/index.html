@@ -21,9 +21,28 @@
       button {
         min-height: 44px;
       }
+      
+      /* Mobile tap feedback */
+      button:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+      }
+      
+      /* Improve mobile input experience */
+      input, select, textarea {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+      
+      /* Mobile-optimized focus states */
+      input:focus, select:focus, textarea:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+      }
     }
   </style>
-  <script type="module" crossorigin src="/wedding-planning/assets/index-CK_X5RyM.js"></script>
+  <script type="module" crossorigin src="/wedding-planning/assets/index-DPmYJNhc.js"></script>
 </head>
 <body>
   <div id="root"></div>

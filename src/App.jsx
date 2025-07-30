@@ -1019,33 +1019,33 @@ const App = () => {
 
           {activeTab === 'our-payments' && (
             <div className="space-y-6">
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
-                <h2 className="text-3xl font-bold mb-2 text-center">M&A Wedding Dashboard</h2>
-                <p className="text-center text-gray-600 mb-2">Wedding: October 4, 2025 (2 months away)</p>
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 sm:p-6 rounded-lg">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-center">M&A Wedding Dashboard</h2>
+                <p className="text-center text-gray-600 mb-2 text-sm sm:text-base">Wedding: October 4, 2025 (2 months away)</p>
               </div>
 
               {/* One-Glance Dashboard */}
-              <div className="bg-white p-6 rounded-lg border shadow">
-                <h3 className="text-xl font-bold mb-4">📊 One-Glance Dashboard</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-4 sm:p-6 rounded-lg border shadow">
+                <h3 className="text-lg sm:text-xl font-bold mb-4">📊 One-Glance Dashboard</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-4">
                     <div className="flex justify-between py-2 border-b">
-                      <span className="font-medium">Total Budget</span>
-                      <span className="font-bold text-lg">${ourPaymentsSummary.total.toLocaleString()}</span>
+                      <span className="font-medium text-sm sm:text-base">Total Budget</span>
+                      <span className="font-bold text-base sm:text-lg">${ourPaymentsSummary.total.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b">
-                      <span className="font-medium">Paid so far</span>
+                      <span className="font-medium text-sm sm:text-base">Paid so far</span>
                       <div className="text-right">
-                        <span className="font-bold text-lg text-green-600">${ourPaymentsSummary.paid.toLocaleString()}</span>
+                        <span className="font-bold text-base sm:text-lg text-green-600">${ourPaymentsSummary.paid.toLocaleString()}</span>
                         <div className="w-32 bg-gray-200 rounded-full h-2 mt-1">
                           <div className="bg-green-500 h-2 rounded-full" style={{width: `${(ourPaymentsSummary.paid/ourPaymentsSummary.total)*100}%`}}></div>
                         </div>
                       </div>
                     </div>
                     <div className="flex justify-between py-2 border-b">
-                      <span className="font-medium">Remaining Balance</span>
+                      <span className="font-medium text-sm sm:text-base">Remaining Balance</span>
                       <div className="text-right">
-                        <span className="font-bold text-lg text-red-600">${ourPaymentsSummary.remaining.toLocaleString()}</span>
+                        <span className="font-bold text-base sm:text-lg text-red-600">${ourPaymentsSummary.remaining.toLocaleString()}</span>
                         <div className="w-32 bg-gray-200 rounded-full h-2 mt-1">
                           <div className="bg-red-500 h-2 rounded-full" style={{width: `${(ourPaymentsSummary.remaining/ourPaymentsSummary.total)*100}%`}}></div>
                         </div>
@@ -1054,8 +1054,8 @@ const App = () => {
                   </div>
                   <div className="space-y-4">
                     <div className="flex justify-between py-2 border-b">
-                      <span className="font-medium">Savings on hand</span>
-                      <span className="font-bold text-lg text-blue-600">
+                      <span className="font-medium text-sm sm:text-base">Savings on hand</span>
+                      <span className="font-bold text-base sm:text-lg text-blue-600">
                         ${(ourFinances.michaelaSavings + ourFinances.arringtonSavings + ourFinances.jointSavings).toLocaleString()}
                       </span>
                     </div>
@@ -1080,8 +1080,8 @@ const App = () => {
               </div>
 
               {/* Savings Tracker */}
-              <div className="bg-green-50 p-6 rounded-lg border">
-                <h3 className="text-xl font-bold mb-4">💰 Savings Tracker</h3>
+              <div className="bg-green-50 p-4 sm:p-6 rounded-lg border">
+                <h3 className="text-lg sm:text-xl font-bold mb-4">💰 Savings Tracker</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">Michaela</label>
@@ -1506,47 +1506,48 @@ const App = () => {
                 </div>
               </div>
 
-              <div className="bg-green-50 p-6 rounded-lg">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold">Incoming Funds Tracker</h3>
+              <div className="bg-green-50 p-4 sm:p-6 rounded-lg">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3">
+                  <h3 className="text-lg sm:text-xl font-bold">Incoming Funds Tracker</h3>
                   <button
                     onClick={() => setShowAddFund(true)}
-                    className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                    className="flex items-center justify-center space-x-2 bg-green-600 text-white px-4 py-3 sm:py-2 rounded-lg hover:bg-green-700 transition-colors min-h-[44px] text-sm sm:text-base"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>Add Fund Source</span>
+                    <span className="sm:inline">Add Fund Source</span>
                   </button>
                 </div>
 
                 {showAddFund && (
                   <div className="bg-white p-4 rounded-lg mb-4 border">
-                    <h4 className="font-semibold mb-3">Add New Fund Source</h4>
+                    <h4 className="font-semibold mb-3 text-sm sm:text-base">Add New Fund Source</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <input
                         type="text"
                         placeholder="Source (e.g., Tax Refund, Gift)"
                         value={newFund.source}
                         onChange={(e) => setNewFund({...newFund, source: e.target.value})}
-                        className="px-3 py-2 border rounded"
+                        className="px-3 py-3 sm:py-2 border rounded text-base sm:text-sm min-h-[44px] focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       />
                       <input
                         type="number"
+                        inputMode="decimal"
                         placeholder="Amount"
                         value={newFund.amount}
                         onChange={(e) => setNewFund({...newFund, amount: e.target.value})}
-                        className="px-3 py-2 border rounded"
+                        className="px-3 py-3 sm:py-2 border rounded text-base sm:text-sm min-h-[44px] focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       />
                       <input
                         type="date"
                         placeholder="Expected Date"
                         value={newFund.dateExpected}
                         onChange={(e) => setNewFund({...newFund, dateExpected: e.target.value})}
-                        className="px-3 py-2 border rounded"
+                        className="px-3 py-3 sm:py-2 border rounded text-base sm:text-sm min-h-[44px] focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       />
                       <select
                         value={newFund.status}
                         onChange={(e) => setNewFund({...newFund, status: e.target.value})}
-                        className="px-3 py-2 border rounded"
+                        className="px-3 py-3 sm:py-2 border rounded text-base sm:text-sm min-h-[44px] focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       >
                         <option value="expected">Expected</option>
                         <option value="received">Received</option>
@@ -1555,20 +1556,20 @@ const App = () => {
                         placeholder="Notes"
                         value={newFund.notes}
                         onChange={(e) => setNewFund({...newFund, notes: e.target.value})}
-                        className="px-3 py-2 border rounded md:col-span-2"
+                        className="px-3 py-3 sm:py-2 border rounded md:col-span-2 text-base sm:text-sm min-h-[88px] focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
                         rows="2"
                       />
                     </div>
-                    <div className="flex space-x-2 mt-3">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2 mt-4">
                       <button
                         onClick={handleAddFund}
-                        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                        className="bg-green-600 text-white px-4 py-3 sm:py-2 rounded hover:bg-green-700 transition-colors min-h-[44px] flex items-center justify-center text-base sm:text-sm font-medium"
                       >
                         Add Fund
                       </button>
                       <button
                         onClick={() => setShowAddFund(false)}
-                        className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+                        className="bg-gray-400 text-white px-4 py-3 sm:py-2 rounded hover:bg-gray-500 transition-colors min-h-[44px] flex items-center justify-center text-base sm:text-sm font-medium"
                       >
                         Cancel
                       </button>
