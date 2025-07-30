@@ -826,171 +826,195 @@ const App = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex justify-between items-center mb-2">
-            {/* Sync Status */}
-            <div className="flex items-center gap-2">
-              {syncStatus === 'offline' && (
-                <div className="flex items-center gap-2 text-gray-500">
-                  <CloudOff className="w-4 h-4" />
-                  <span className="text-sm">Offline Mode</span>
+        <div className="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-6">
+          {/* Mobile-First Header Layout */}
+          <div className="space-y-4">
+            {/* Top Row: Sync Status and Actions */}
+            <div className="flex justify-between items-center">
+              {/* Sync Status - Compact on Mobile */}
+              <div className="flex items-center gap-2">
+                {syncStatus === 'offline' && (
+                  <div className="flex items-center gap-1 text-gray-500">
+                    <CloudOff className="w-4 h-4" />
+                    <span className="text-xs sm:text-sm hidden sm:inline">Offline Mode</span>
+                    <span className="text-xs sm:hidden">Offline</span>
+                  </div>
+                )}
+                {syncStatus === 'syncing' && (
+                  <div className="flex items-center gap-1 text-blue-500">
+                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-xs sm:text-sm hidden sm:inline">Syncing...</span>
+                    <span className="text-xs sm:hidden">Sync</span>
+                  </div>
+                )}
+                {syncStatus === 'synced' && (
+                  <div className="flex items-center gap-1 text-green-500">
+                    <Cloud className="w-4 h-4" />
+                    <span className="text-xs sm:text-sm hidden sm:inline">Cloud Synced</span>
+                    <span className="text-xs sm:hidden">Synced</span>
+                    {lastSyncTime && (
+                      <span className="text-xs text-gray-400 hidden md:inline">
+                        {lastSyncTime.toLocaleTimeString()}
+                      </span>
+                    )}
+                  </div>
+                )}
+                {syncStatus === 'error' && (
+                  <div className="flex items-center gap-1 text-red-500">
+                    <AlertCircle className="w-4 h-4" />
+                    <span className="text-xs sm:text-sm hidden sm:inline">Sync Error</span>
+                    <span className="text-xs sm:hidden">Error</span>
+                  </div>
+                )}
+              </div>
+              
+              {/* Action Buttons - Touch-Friendly */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={exportAllData}
+                  className="flex items-center gap-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-2 min-h-[44px] rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all text-sm font-medium"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Export</span>
+                </button>
+                
+                {/* Utility Menu - Hidden on Mobile by Default */}
+                <div className="hidden md:flex space-x-2">
+                  <button
+                    onClick={fixVendorResponsibilities}
+                    className="text-xs bg-blue-200 hover:bg-blue-300 px-3 py-2 min-h-[36px] rounded font-medium"
+                    title="Fix missing responsibilities"
+                  >
+                    Fix Responsibilities
+                  </button>
+                  <button
+                    onClick={resetToDefaultData}
+                    className="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-2 min-h-[36px] rounded font-medium"
+                    title="Reset to default data"
+                  >
+                    Reset Data
+                  </button>
                 </div>
-              )}
-              {syncStatus === 'syncing' && (
-                <div className="flex items-center gap-2 text-blue-500">
-                  <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-sm">Syncing...</span>
-                </div>
-              )}
-              {syncStatus === 'synced' && (
-                <div className="flex items-center gap-2 text-green-500">
-                  <Cloud className="w-4 h-4" />
-                  <span className="text-sm">Cloud Synced</span>
-                  {lastSyncTime && (
-                    <span className="text-xs text-gray-400">
-                      {lastSyncTime.toLocaleTimeString()}
-                    </span>
-                  )}
-                </div>
-              )}
-              {syncStatus === 'error' && (
-                <div className="flex items-center gap-2 text-red-500">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">Sync Error</span>
-                </div>
-              )}
+              </div>
             </div>
             
-            <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              Wedding Financial Planner
-            </h1>
-            
-            <div className="flex space-x-2">
-              {/* Export Button */}
-              <button
-                onClick={exportAllData}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all text-sm"
-              >
-                <Download className="w-4 h-4" />
-                Export
-              </button>
-              <button
-                onClick={fixVendorResponsibilities}
-                className="text-xs bg-blue-200 hover:bg-blue-300 px-2 py-1 rounded"
-                title="Fix missing responsibilities"
-              >
-                Fix Responsibilities
-              </button>
-              <button
-                onClick={resetToDefaultData}
-                className="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
-                title="Reset to default data"
-              >
-                Reset Data
-              </button>
+            {/* Title Row - Responsive Size */}
+            <div className="text-center">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                Wedding Financial Planner
+              </h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-1">October Wedding - M&A</p>
             </div>
           </div>
-          <p className="text-center text-gray-600">October Wedding - M&A</p>
           
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-gradient-to-r from-red-100 to-pink-100 p-4 rounded-lg">
+          {/* Mobile-Optimized Dashboard Cards */}
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="bg-gradient-to-r from-red-100 to-pink-100 p-3 sm:p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Due Sept 4th</p>
-                  <p className="text-2xl font-bold text-red-700">${sept4Summary.remaining.toLocaleString()}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Due Sept 4th</p>
+                  <p className="text-xl sm:text-2xl font-bold text-red-700">${sept4Summary.remaining.toLocaleString()}</p>
                 </div>
-                <AlertCircle className="w-8 h-8 text-red-600" />
+                <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8 text-red-600" />
               </div>
             </div>
             
-            <div className="bg-gradient-to-r from-green-100 to-emerald-100 p-4 rounded-lg">
+            <div className="bg-gradient-to-r from-green-100 to-emerald-100 p-3 sm:p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Saved</p>
-                  <p className="text-2xl font-bold text-green-700">${totalSavings.toLocaleString()}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Total Saved</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-700">${totalSavings.toLocaleString()}</p>
                 </div>
-                <PiggyBank className="w-8 h-8 text-green-600" />
+                <PiggyBank className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
               </div>
             </div>
             
-            <div className={`p-4 rounded-lg ${totalSavings >= sept4Summary.remaining ? 'bg-gradient-to-r from-green-100 to-emerald-100' : 'bg-gradient-to-r from-orange-100 to-red-100'}`}>
+            <div className={`p-3 sm:p-4 rounded-lg ${totalSavings >= sept4Summary.remaining ? 'bg-gradient-to-r from-green-100 to-emerald-100' : 'bg-gradient-to-r from-orange-100 to-red-100'}`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">{totalSavings >= sept4Summary.remaining ? 'Surplus' : 'Shortfall'}</p>
-                  <p className={`text-2xl font-bold ${totalSavings >= sept4Summary.remaining ? 'text-green-700' : 'text-red-700'}`}>
+                  <p className="text-xs sm:text-sm text-gray-600">{totalSavings >= sept4Summary.remaining ? 'Surplus' : 'Shortfall'}</p>
+                  <p className={`text-xl sm:text-2xl font-bold ${totalSavings >= sept4Summary.remaining ? 'text-green-700' : 'text-red-700'}`}>
                     ${Math.abs(totalSavings - sept4Summary.remaining).toLocaleString()}
                   </p>
                 </div>
-                <TrendingUp className={`w-8 h-8 ${totalSavings >= sept4Summary.remaining ? 'text-green-600' : 'text-red-600'}`} />
+                <TrendingUp className={`w-6 h-6 sm:w-8 sm:h-8 ${totalSavings >= sept4Summary.remaining ? 'text-green-600' : 'text-red-600'}`} />
               </div>
             </div>
             
-            <div className="bg-gradient-to-r from-purple-100 to-pink-100 p-4 rounded-lg">
+            <div className="bg-gradient-to-r from-purple-100 to-pink-100 p-3 sm:p-4 rounded-lg sm:col-span-2 lg:col-span-1">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Days Until Wedding</p>
-                  <p className="text-2xl font-bold text-purple-700">
+                  <p className="text-xs sm:text-sm text-gray-600">Days Until Wedding</p>
+                  <p className="text-xl sm:text-2xl font-bold text-purple-700">
                     {Math.max(0, Math.ceil((new Date('2025-10-04') - new Date()) / (1000 * 60 * 60 * 24)))}
                   </p>
                 </div>
-                <Calendar className="w-8 h-8 text-purple-600" />
+                <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex space-x-4 mb-6 border-b">
-            <button
-              onClick={() => setActiveTab('our-payments')}
-              className={`pb-2 px-4 font-semibold transition-colors ${
-                activeTab === 'our-payments' 
-                  ? 'text-purple-600 border-b-2 border-purple-600' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Our Payments
-            </button>
-            <button
-              onClick={() => setActiveTab('finances')}
-              className={`pb-2 px-4 font-semibold transition-colors ${
-                activeTab === 'finances' 
-                  ? 'text-purple-600 border-b-2 border-purple-600' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Financial Planning
-            </button>
-            <button
-              onClick={() => setActiveTab('vendors')}
-              className={`pb-2 px-4 font-semibold transition-colors ${
-                activeTab === 'vendors' 
-                  ? 'text-purple-600 border-b-2 border-purple-600' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Vendors & Expenses
-            </button>
-            <button
-              onClick={() => setActiveTab('todos')}
-              className={`pb-2 px-4 font-semibold transition-colors ${
-                activeTab === 'todos' 
-                  ? 'text-purple-600 border-b-2 border-purple-600' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Wedding Todo ✨
-            </button>
-            <button
-              onClick={() => setActiveTab('summary')}
-              className={`pb-2 px-4 font-semibold transition-colors ${
-                activeTab === 'summary' 
-                  ? 'text-purple-600 border-b-2 border-purple-600' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Summary
-            </button>
+        <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
+          {/* Mobile-Friendly Tab Navigation */}
+          <div className="overflow-x-auto scrollbar-hide mb-6 border-b">
+            <div className="flex space-x-1 sm:space-x-4 min-w-max">
+              <button
+                onClick={() => setActiveTab('our-payments')}
+                className={`pb-3 px-3 sm:px-4 min-h-[44px] font-semibold transition-colors whitespace-nowrap text-sm sm:text-base ${
+                  activeTab === 'our-payments' 
+                    ? 'text-purple-600 border-b-2 border-purple-600' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <span className="sm:hidden">💸 Payments</span>
+                <span className="hidden sm:inline">Our Payments</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('finances')}
+                className={`pb-3 px-3 sm:px-4 min-h-[44px] font-semibold transition-colors whitespace-nowrap text-sm sm:text-base ${
+                  activeTab === 'finances' 
+                    ? 'text-purple-600 border-b-2 border-purple-600' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <span className="sm:hidden">📊 Planning</span>
+                <span className="hidden sm:inline">Financial Planning</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('vendors')}
+                className={`pb-3 px-3 sm:px-4 min-h-[44px] font-semibold transition-colors whitespace-nowrap text-sm sm:text-base ${
+                  activeTab === 'vendors' 
+                    ? 'text-purple-600 border-b-2 border-purple-600' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <span className="sm:hidden">🏪 Vendors</span>
+                <span className="hidden sm:inline">Vendors & Expenses</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('todos')}
+                className={`pb-3 px-3 sm:px-4 min-h-[44px] font-semibold transition-colors whitespace-nowrap text-sm sm:text-base ${
+                  activeTab === 'todos' 
+                    ? 'text-purple-600 border-b-2 border-purple-600' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <span className="sm:hidden">✨ Todo</span>
+                <span className="hidden sm:inline">Wedding Todo ✨</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('summary')}
+                className={`pb-3 px-3 sm:px-4 min-h-[44px] font-semibold transition-colors whitespace-nowrap text-sm sm:text-base ${
+                  activeTab === 'summary' 
+                    ? 'text-purple-600 border-b-2 border-purple-600' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <span className="sm:hidden">📋 Summary</span>
+                <span className="hidden sm:inline">Summary</span>
+              </button>
+            </div>
           </div>
 
           {activeTab === 'our-payments' && (
@@ -1098,14 +1122,75 @@ const App = () => {
                 </div>
               </div>
 
-              {/* Vendor & Cost Detail Table */}
-              <div className="bg-white p-6 rounded-lg border shadow">
+              {/* Vendor & Cost Detail - Mobile Cards + Desktop Table */}
+              <div className="bg-white p-4 sm:p-6 rounded-lg border shadow">
                 <h3 className="text-xl font-bold mb-4">📋 Vendor & Cost Detail 
                   <span className="text-sm font-normal text-gray-600 ml-2">
                     ({filteredVendors.filter(vendor => vendor.responsibility === 'Us' || vendor.responsibility === 'Michaela').length} filtered vendors)
                   </span>
                 </h3>
-                <div className="overflow-x-auto">
+
+                {/* Mobile Card Layout */}
+                <div className="md:hidden space-y-4">
+                  {getSortedVendors(filteredVendors.filter(vendor => vendor.responsibility === 'Us' || vendor.responsibility === 'Michaela')).map(vendor => (
+                    <div key={vendor.id} className="bg-gray-50 rounded-lg p-4 border">
+                      {/* Card Header */}
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="font-semibold text-gray-900 text-sm leading-tight flex-1 pr-2">{vendor.name}</h4>
+                        <span className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
+                          vendor.responsibility === 'Us' ? 'bg-blue-100 text-blue-800' :
+                          vendor.responsibility === 'Michaela' ? 'bg-pink-100 text-pink-800' :
+                          'bg-green-100 text-green-800'
+                        }`}>
+                          {vendor.responsibility || 'Us'}
+                        </span>
+                      </div>
+                      
+                      {/* Card Body - Financial Info */}
+                      <div className="grid grid-cols-3 gap-3 mb-3">
+                        <div className="text-center">
+                          <p className="text-xs text-gray-500 mb-1">Total Cost</p>
+                          <p className="font-semibold text-gray-900">${vendor.total.toLocaleString()}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-gray-500 mb-1">Paid</p>
+                          <p className="font-semibold text-green-600">${vendor.paid.toLocaleString()}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-gray-500 mb-1">Remaining</p>
+                          <p className="font-semibold text-red-600">${vendor.remaining.toLocaleString()}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Card Footer - Due Date & Notes */}
+                      <div className="pt-3 border-t border-gray-200">
+                        <div className="flex justify-between items-center text-sm">
+                          <div className="flex items-center">
+                            <Calendar className="w-4 h-4 text-gray-400 mr-1" />
+                            <span className="text-gray-600">
+                              {vendor.dueDate ? new Date(vendor.dueDate).toLocaleDateString() : 'No due date'}
+                            </span>
+                          </div>
+                          {vendor.status && (
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              vendor.status === 'completed' ? 'bg-green-100 text-green-800' :
+                              vendor.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {vendor.status}
+                            </span>
+                          )}
+                        </div>
+                        {vendor.notes && (
+                          <p className="text-xs text-gray-600 mt-2 line-clamp-2">{vendor.notes}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop Table Layout */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50 border-b">

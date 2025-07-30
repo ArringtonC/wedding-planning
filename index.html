@@ -6,6 +6,23 @@
   <title>Wedding Financial Planner</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* Hide scrollbars for mobile tab navigation */
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Ensure touch targets are accessible */
+    @media (max-width: 640px) {
+      button {
+        min-height: 44px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div id="root"></div>
