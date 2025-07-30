@@ -82,10 +82,21 @@ export const supabaseOps = {
       const { data, error } = await supabase
         .from('wedding_todos')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('createdAt', { ascending: false });
       
       if (error) throw error;
-      return data || [];
+      console.log('Fetched todos from Supabase:', data?.length || 0, 'items');
+      
+      // Map database fields to app fields if needed
+      const todos = (data || []).map(todo => ({
+        id: todo.id,
+        task: todo.task,
+        dueDate: todo.dueDate,
+        completed: todo.completed,
+        createdAt: todo.createdAt
+      }));
+      
+      return todos;
     } catch (error) {
       console.error('Error fetching todos:', error);
       return null;
@@ -103,14 +114,22 @@ export const supabaseOps = {
 
       if (deleteError) throw deleteError;
 
-      const { error: insertError } = await supabase
-        .from('wedding_todos')
-        .insert(todos.map(todo => ({
-          ...todo,
-          created_at: todo.createdAt || new Date().toISOString()
-        })));
+      // Only insert if there are todos to save
+      if (todos.length > 0) {
+        const { error: insertError } = await supabase
+          .from('wedding_todos')
+          .insert(todos.map(todo => ({
+            id: todo.id,
+            task: todo.task,
+            dueDate: todo.dueDate,
+            completed: todo.completed,
+            createdAt: todo.createdAt || new Date().toISOString()
+          })));
 
-      if (insertError) throw insertError;
+        if (insertError) throw insertError;
+      }
+      
+      console.log('Saved todos to Supabase:', todos.length, 'items');
       return true;
     } catch (error) {
       console.error('Error saving todos:', error);
