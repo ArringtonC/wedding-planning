@@ -35,7 +35,7 @@ const App = () => {
   });
 
   // Wedding Todo List state
-  const [weddingTodos, setWeddingTodos] = useState(() => loadData('weddingTodos', []));
+  const [weddingTodos, setWeddingTodos] = useState(() => []);
   const [newTodo, setNewTodo] = useState({
     task: '',
     dueDate: '',
@@ -82,173 +82,8 @@ const App = () => {
     jointPaid: 0
   }));
   
-  const [vendors, setVendors] = useState(() => loadData('weddingVendors', [
-    {
-      id: 1,
-      name: 'Venue: Botanical Gardens',
-      total: 9175,
-      paid: 3750,
-      paidBy: 'Parents (us 500)',
-      remaining: 4925,
-      remainingBy: 'Parents',
-      responsibility: 'Parents',
-      notes: 'M+A are responsible for bartenders',
-      link: ''
-    },
-    {
-      id: 2,
-      name: 'Caterer: China\'s Creations',
-      total: 7254,
-      paid: 2504,
-      paidBy: 'Parents (us: $250)',
-      remaining: 4750,
-      remainingBy: 'Parents',
-      responsibility: 'Parents',
-      notes: 'US: 250 to venue',
-      link: 'https://www.paypal.com/invoice/p/#3KHJDE6V384EFWPD'
-    },
-    {
-      id: 3,
-      name: 'Florals & Vases: Native Petals',
-      total: 11900.5,
-      paid: 1545,
-      paidBy: 'Parents (us: $545)',
-      remaining: 11355,
-      remainingBy: 'Parents',
-      responsibility: 'Parents',
-      notes: 'Depending on the amount if tables needed could save 1k',
-      link: 'https://app.squareup.com/pay-invoice/inv:0-ChDvTcmV8c4yInnbPCGS4Ey_ENQJ'
-    },
-    {
-      id: 4,
-      name: 'Photography and Video: Flemings',
-      total: 6831.88,
-      paid: 5708.75,
-      paidBy: 'Us',
-      remaining: 1123.13,
-      remainingBy: 'Us',
-      responsibility: 'Us',
-      notes: 'Will reach out at least 3 weeks before the wedding; money due sept 4',
-      link: ''
-    },
-    {
-      id: 5,
-      name: 'Cake: Abundantly Sweets',
-      total: 1380,
-      paid: 690,
-      paidBy: 'Us',
-      remaining: 690,
-      remainingBy: 'Us',
-      responsibility: 'Us',
-      notes: 'Could go down based on number on guest count',
-      link: ''
-    },
-    {
-      id: 6,
-      name: 'DJ: Don Jr',
-      total: 1300,
-      paid: 250,
-      paidBy: 'Us',
-      remaining: 1050,
-      remainingBy: 'Us',
-      responsibility: 'Us',
-      notes: '',
-      link: ''
-    },
-    {
-      id: 7,
-      name: 'Violin: Johnathan',
-      total: 1260,
-      paid: 420,
-      paidBy: 'Us',
-      remaining: 840,
-      remainingBy: 'Us',
-      responsibility: 'Us',
-      notes: '',
-      link: ''
-    },
-    {
-      id: 8,
-      name: 'Makeup',
-      total: 300,
-      paid: 0,
-      paidBy: '',
-      remaining: 300,
-      remainingBy: 'Us',
-      responsibility: 'Michaela',
-      notes: '$115 for bridesmaids',
-      link: ''
-    },
-    {
-      id: 9,
-      name: 'Signage: Chanarda',
-      total: 300,
-      paid: 0,
-      paidBy: '',
-      remaining: 300,
-      remainingBy: 'Us',
-      responsibility: 'Us',
-      notes: '',
-      link: ''
-    },
-    {
-      id: 10,
-      name: 'Giveaways',
-      total: 800,
-      paid: 0,
-      paidBy: '',
-      remaining: 800,
-      remainingBy: 'Us',
-      responsibility: 'Us',
-      notes: '',
-      link: ''
-    },
-    {
-      id: 11,
-      name: 'Invitations and other cards',
-      total: 350,
-      paid: 0,
-      paidBy: '',
-      remaining: 350,
-      remainingBy: 'Us',
-      responsibility: 'Us',
-      notes: '',  
-      link: ''
-    },
-    {
-      id: 12,
-      name: 'Bar: Venue',
-      total: 5000,
-      paid: 0,
-      paidBy: '',
-      remaining: 5000,
-      remainingBy: 'Us',
-      responsibility: 'Us',
-      notes: 'Us (250/bartender)',
-      link: ''
-    }
-  ]));
-
-  const [incomingFunds, setIncomingFunds] = useState(() => loadData('weddingFunds', [
-    {
-      id: 1,
-      source: 'Tax Refund',
-      amount: 2000,
-      dateExpected: '2025-03-15',
-      dateReceived: '',
-      status: 'expected',
-      notes: 'Federal tax return'
-    },
-    {
-      id: 2,
-      source: 'Wedding Gift - Grandparents',
-      amount: 1000,
-      dateExpected: '2025-06-01',
-      dateReceived: '',
-      status: 'expected',
-      notes: ''
-    }
-  ]));
+  const [vendors, setVendors] = useState(() => []);
+  const [incomingFunds, setIncomingFunds] = useState(() => []);
 
   // Save data to localStorage whenever it changes
   useEffect(() => {
@@ -634,7 +469,11 @@ const App = () => {
   };
 
   const loadFromSupabase = async () => {
-    if (!isSupabaseEnabled) return;
+    if (!isSupabaseEnabled) {
+      // Fallback to localStorage if Supabase is not enabled
+      loadFromLocalStorage();
+      return;
+    }
     
     setIsSyncing(true);
     setSyncStatus('syncing');
@@ -651,12 +490,29 @@ const App = () => {
       if (supabaseVendors !== null) {
         console.log('Loading vendors from Supabase:', supabaseVendors.length, 'items');
         setVendors(supabaseVendors);
+      } else {
+        // Fallback to localStorage for vendors
+        const localVendors = loadData('weddingVendors', []);
+        if (localVendors.length > 0) {
+          console.log('Loading vendors from localStorage (Supabase fallback):', localVendors.length, 'items');
+          setVendors(localVendors);
+        }
       }
+      
       if (supabaseTodos !== null) {
         console.log('Loading todos from Supabase:', supabaseTodos.length, 'items');
         setWeddingTodos(supabaseTodos);
+      } else {
+        // Fallback to localStorage for todos
+        const localTodos = loadData('weddingTodos', []);
+        if (localTodos.length > 0) {
+          console.log('Loading todos from localStorage (Supabase fallback):', localTodos.length, 'items');
+          setWeddingTodos(localTodos);
+        }
       }
+      
       if (supabaseFinances) {
+        console.log('Loading finances from Supabase:', supabaseFinances);
         setOurFinances({
           michaelaSavings: supabaseFinances.michaela_savings || 0,
           arringtonSavings: supabaseFinances.arrington_savings || 0,
@@ -665,9 +521,25 @@ const App = () => {
           arringtonPaid: supabaseFinances.arrington_paid || 0,
           jointPaid: supabaseFinances.joint_paid || 0
         });
+      } else {
+        // Fallback to localStorage for finances
+        const localFinances = loadData('ourFinances', null);
+        if (localFinances) {
+          console.log('Loading finances from localStorage (Supabase fallback):', localFinances);
+          setOurFinances(localFinances);
+        }
       }
+      
       if (supabaseFunds !== null) {
+        console.log('Loading funds from Supabase:', supabaseFunds.length, 'items');
         setIncomingFunds(supabaseFunds);
+      } else {
+        // Fallback to localStorage for funds
+        const localFunds = loadData('weddingFunds', []);
+        if (localFunds.length > 0) {
+          console.log('Loading funds from localStorage (Supabase fallback):', localFunds.length, 'items');
+          setIncomingFunds(localFunds);
+        }
       }
 
       setSyncStatus('synced');
@@ -675,8 +547,35 @@ const App = () => {
     } catch (error) {
       console.error('Error loading from Supabase:', error);
       setSyncStatus('error');
+      // Fallback to localStorage on error
+      loadFromLocalStorage();
     } finally {
       setIsSyncing(false);
+    }
+  };
+
+  const loadFromLocalStorage = () => {
+    console.log('Loading all data from localStorage...');
+    const localVendors = loadData('weddingVendors', []);
+    const localTodos = loadData('weddingTodos', []);
+    const localFinances = loadData('ourFinances', null);
+    const localFunds = loadData('weddingFunds', []);
+    
+    if (localVendors.length > 0) {
+      console.log('Loading vendors from localStorage:', localVendors.length, 'items');
+      setVendors(localVendors);
+    }
+    if (localTodos.length > 0) {
+      console.log('Loading todos from localStorage:', localTodos.length, 'items');
+      setWeddingTodos(localTodos);
+    }
+    if (localFinances) {
+      console.log('Loading finances from localStorage:', localFinances);
+      setOurFinances(localFinances);
+    }
+    if (localFunds.length > 0) {
+      console.log('Loading funds from localStorage:', localFunds.length, 'items');
+      setIncomingFunds(localFunds);
     }
   };
 
