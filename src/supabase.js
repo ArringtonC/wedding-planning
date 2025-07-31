@@ -50,11 +50,11 @@ export const supabaseOps = {
         name: vendor.name,
         total: vendor.total || 0,
         paid: vendor.paid || 0,
-        paidBy: vendor.paidBy || '',
+        paidBy: vendor.paid_by || '',
         remaining: vendor.remaining || 0,
-        remainingBy: vendor.remainingBy || 'Us',
+        remainingBy: vendor.remaining_by || 'Us',
         responsibility: vendor.responsibility || 'Us',
-        dueDate: vendor.dueDate,
+        dueDate: vendor.due_date,
         status: vendor.status || 'pending',
         notes: vendor.notes || '',
         link: vendor.link || '',
@@ -88,11 +88,11 @@ export const supabaseOps = {
             name: vendor.name,
             total: vendor.total,
             paid: vendor.paid,
-            paidBy: vendor.paidBy,
+            paid_by: vendor.paidBy,
             remaining: vendor.remaining,
-            remainingBy: vendor.remainingBy,
+            remaining_by: vendor.remainingBy,
             responsibility: vendor.responsibility,
-            dueDate: vendor.dueDate,
+            due_date: vendor.dueDate,
             status: vendor.status,
             notes: vendor.notes,
             link: vendor.link,
@@ -126,7 +126,7 @@ export const supabaseOps = {
       const todos = (data || []).map(todo => ({
         id: todo.id,
         task: todo.task,
-        dueDate: todo.dueDate,
+        dueDate: todo.due_date,
         completed: todo.completed,
         createdAt: todo.created_at
       }));
@@ -156,7 +156,7 @@ export const supabaseOps = {
           .insert(todos.map(todo => ({
             id: todo.id,
             task: todo.task,
-            dueDate: todo.dueDate,
+            due_date: todo.dueDate,
             completed: todo.completed,
             created_at: todo.createdAt || new Date().toISOString()
           })));
@@ -251,8 +251,8 @@ export const supabaseOps = {
             id: fund.id,
             source: fund.source,
             amount: fund.amount,
-            dateExpected: fund.dateExpected,
-            dateReceived: fund.dateReceived,
+            date_expected: fund.dateExpected,
+            date_received: fund.dateReceived,
             status: fund.status,
             notes: fund.notes,
             created_at: fund.createdAt || new Date().toISOString()
