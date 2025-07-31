@@ -455,17 +455,22 @@ const App = () => {
       setWeddingTodos([...weddingTodos, todo]);
       setNewTodo({ task: '', dueDate: '', completed: false });
       setShowAddTodo(false);
+      console.log('Todo added, triggering sync:', todo.task);
     }
   };
 
   const toggleTodoComplete = (id) => {
+    const todoToToggle = weddingTodos.find(t => t.id === id);
     setWeddingTodos(weddingTodos.map(todo => 
       todo.id === id ? { ...todo, completed: !todo.completed } : todo
     ));
+    console.log('Todo toggled, triggering sync:', todoToToggle?.task, '- completed:', !todoToToggle?.completed);
   };
 
   const deleteTodo = (id) => {
+    const todoToDelete = weddingTodos.find(t => t.id === id);
     setWeddingTodos(weddingTodos.filter(todo => todo.id !== id));
+    console.log('Todo deleted, triggering sync:', todoToDelete?.task || id);
   };
 
   // Supabase sync functions

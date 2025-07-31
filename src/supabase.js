@@ -141,16 +141,24 @@ export const supabaseOps = {
   async saveTodos(todos) {
     if (!supabase) return false;
     try {
+      console.log('Starting todo save operation, todos to save:', todos.length);
+      
       // Clear existing todos and insert new ones
       const { error: deleteError } = await supabase
         .from('wedding_todos')
         .delete()
         .neq('id', 0); // Delete all rows
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error('Error deleting existing todos:', deleteError);
+        throw deleteError;
+      }
+      console.log('Cleared existing todos from database');
 
       // Only insert if there are todos to save
       if (todos.length > 0) {
+        console.log('Inserting todos:', todos.map(t => ({ task: t.task, dueDate: t.dueDate, completed: t.completed })));
+        
         const { error: insertError } = await supabase
           .from('wedding_todos')
           .insert(todos.map(todo => ({
@@ -161,13 +169,17 @@ export const supabaseOps = {
             created_at: todo.createdAt || new Date().toISOString()
           })));
 
-        if (insertError) throw insertError;
+        if (insertError) {
+          console.error('Error inserting todos:', insertError);
+          throw insertError;
+        }
+        console.log('✅ Successfully inserted todos to database');
       }
       
-      console.log('Saved todos to Supabase:', todos.length, 'items');
+      console.log('✅ Saved todos to Supabase:', todos.length, 'items');
       return true;
     } catch (error) {
-      console.error('Error saving todos:', error);
+      console.error('❌ Error saving todos:', error);
       return false;
     }
   },
